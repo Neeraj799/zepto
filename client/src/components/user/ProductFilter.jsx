@@ -12,12 +12,12 @@ const ProductFilter = ({ filters, handleFilter }) => {
       </div>
       <div className="p-4 space-y-4">
         {Object.keys(filterOptions).map((item) => (
-          <div>
+          <div key={item}>
             <div>
               <h3 className="text-base font-semibold">{item}</h3>
               <div>
                 {filterOptions[item].map((option) => (
-                  <div className="flex items-center gap-2 ">
+                  <div key={option.id} className="flex items-center gap-2 ">
                     <Checkbox
                       checked={
                         filters &&

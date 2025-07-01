@@ -5,8 +5,8 @@ import { Button } from "../ui/button";
 
 const ListProduct = ({ product }) => {
   return (
-    <div>
-      <Card className="w-full max-w-sm mx-auto">
+    <div className="mt-6 ml-10">
+      <Card className="w-full max-w-sm mx-auto pt-0 mb-10">
         <div>
           <div className="relative">
             <img

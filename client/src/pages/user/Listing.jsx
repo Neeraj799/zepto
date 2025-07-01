@@ -124,7 +124,9 @@ const Listing = () => {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {productList && productList.length > 0 ? (
-            productList.map((item) => <ListProduct product={item} />)
+            productList.map((item) => (
+              <ListProduct key={item._id} product={item} />
+            ))
           ) : (
             <div></div>
           )}
