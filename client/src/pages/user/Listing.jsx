@@ -8,19 +8,31 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import ListProduct from "@/components/user/ListProduct";
+import ProductDetails from "@/components/user/ProductDetails";
 import ProductFilter from "@/components/user/ProductFilter";
-import { fetchAllFilteredProducts } from "@/store/user/productSlice";
+import { addToCart, fetchCartItems } from "@/store/user/cartSlice";
+import {
+  fetchAllFilteredProducts,
+  fetchProductDetails,
+} from "@/store/user/productSlice";
 import { ArrowUpDown } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createSearchParams, useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
 
 const Listing = () => {
   const dispatch = useDispatch();
-  const { productList } = useSelector((state) => state.userProducts);
+  const { productList, productDetails } = useSelector(
+    (state) => state.userProducts
+  );
+  const { user } = useSelector((state) => state.auth);
+
   const [filters, setFilters] = useState({});
   const [sort, setSort] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [openproductDetailsDialog, setOpenProductDetailsDialog] =
+    useState(false);
 
   const handleSort = (value) => {
     console.log(value);
@@ -67,6 +79,27 @@ const Listing = () => {
     localStorage.setItem("filters", JSON.stringify(copyFilters));
   };
 
+  const handleProductDetails = (productId) => {
+    console.log(productId);
+    dispatch(fetchProductDetails(productId));
+  };
+
+  const handleAddToCart = (productId) => {
+    console.log(productId);
+
+    dispatch(addToCart({ userId: user?._id, productId, quantity: 1 })).then(
+      (data) => {
+        if (data?.payload.success) {
+          console.log("data", data);
+          console.log("user", user);
+
+          dispatch(fetchCartItems({ id: user?._id }));
+          toast.success("Product added to cart");
+        }
+      }
+    );
+  };
+
   useEffect(() => {
     setSort("price-lowtohigh");
     setFilters(JSON.parse(localStorage.getItem("filters")) || {});
@@ -86,7 +119,11 @@ const Listing = () => {
     }
   }, [filters]);
 
-  console.log("filters", filters);
+  useEffect(() => {
+    if (productDetails !== null) {
+      setOpenProductDetailsDialog(true);
+    }
+  }, [productDetails]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6">
@@ -125,13 +162,23 @@ const Listing = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {productList && productList.length > 0 ? (
             productList.map((item) => (
-              <ListProduct key={item._id} product={item} />
+              <ListProduct
+                key={item._id}
+                product={item}
+                productDetails={handleProductDetails}
+                handleAddToCart={handleAddToCart}
+              />
             ))
           ) : (
             <div></div>
           )}
         </div>
       </div>
+      <ProductDetails
+        open={openproductDetailsDialog}
+        setOpen={setOpenProductDetailsDialog}
+        productDetails={productDetails}
+      />
     </div>
   );
 };

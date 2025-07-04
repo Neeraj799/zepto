@@ -1,5 +1,5 @@
 import { LogOut, Menu, ShoppingCart, User } from "lucide-react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Button } from "../ui/button";
@@ -17,18 +17,35 @@ import { Avatar, AvatarFallback } from "../ui/avatar";
 import { logoutUser } from "@/store/auth-slice";
 import { toast } from "sonner";
 import { DialogTitle } from "../ui/dialog";
+import CartWrapper from "./CartWrapper";
+import { fetchCartItems } from "@/store/user/cartSlice";
+import { Label } from "../ui/label";
 
 const MenuItems = () => {
+  const navigate = useNavigate();
+
+  const handleNavigate = (menuItem) => {
+    localStorage.removeItem("filters");
+    const currentFilter =
+      menuItem?.id !== "home"
+        ? {
+            category: [menuItem?.id],
+          }
+        : null;
+
+    localStorage.setItem("filters", JSON.stringify(currentFilter));
+    navigate(menuItem.path);
+  };
   return (
     <div className="flex flex-col mb-3 lg:mb-0 lg: items-center gap-6 lg:flex-row">
       {shoppingViewHeaderMenuItems.map((menuItem) => (
-        <Link
-          className="text-sm font-medium"
+        <Label
+          onClick={() => handleNavigate(menuItem)}
+          className="text-sm font-medium cursor-pointer"
           key={menuItem.id}
-          to={menuItem.path}
         >
           {menuItem.label}
-        </Link>
+        </Label>
       ))}
     </div>
   );
@@ -36,6 +53,8 @@ const MenuItems = () => {
 
 const HeaderRightContent = () => {
   const { user } = useSelector((state) => state.auth);
+  const { cartItems } = useSelector((state) => state.userCart);
+  const [openCart, setOpenCart] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -43,12 +62,28 @@ const HeaderRightContent = () => {
     dispatch(logoutUser());
     toast.success("User logged out successfully");
   };
+
+  useEffect(() => {
+    dispatch(fetchCartItems({ id: user?._id }));
+  }, [dispatch, user?._id]);
+
   return (
     <div className="flex lg:items-center sm:flex-row flex-col gap-4 p-4">
-      <Button className="cursor-pointer">
-        <ShoppingCart className="h-6 w-6" />
-        <span className="sr-only ">User cart</span>
-      </Button>
+      <Sheet open={openCart} onOpenChange={setOpenCart(false)}>
+        <Button onClick={() => setOpenCart(true)} className="cursor-pointer">
+          <ShoppingCart className="h-6 w-6" />
+          <span className="sr-only ">User cart</span>
+        </Button>
+
+        <CartWrapper
+          cartItems={
+            cartItems && cartItems.items && cartItems.items.length > 0
+              ? cartItems.items
+              : []
+          }
+        />
+      </Sheet>
+
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Avatar className="bg-black cursor-pointer">

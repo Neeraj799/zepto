@@ -3,11 +3,11 @@ import { Card, CardContent, CardFooter } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 
-const ListProduct = ({ product }) => {
+const ListProduct = ({ product, productDetails, handleAddToCart }) => {
   return (
     <div className="mt-6 ml-10">
       <Card className="w-full max-w-sm mx-auto pt-0 mb-10">
-        <div>
+        <div onClick={() => productDetails(product?._id)}>
           <div className="relative">
             <img
               src={product?.image}
@@ -46,10 +46,15 @@ const ListProduct = ({ product }) => {
               ) : null}
             </div>
           </CardContent>
-          <CardFooter>
-            <Button className="w-full">Add to cart</Button>
-          </CardFooter>
         </div>
+        <CardFooter>
+          <Button
+            onClick={() => handleAddToCart(product?._id)}
+            className="w-full"
+          >
+            Add to cart
+          </Button>
+        </CardFooter>
       </Card>
     </div>
   );
