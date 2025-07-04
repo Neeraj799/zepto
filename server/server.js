@@ -6,6 +6,7 @@ import envConfig from "./config/envConfig.js";
 import userRoutes from "../server/routes/user/auth.routes.js";
 import adminProductsRoutes from "../server/routes/admin/productRoutes.js";
 import userProductsRoutes from "../server/routes/user/product.routes.js";
+import userCartRoutes from "../server/routes/user/cart.routes.js";
 
 dotenv.config();
 
@@ -40,6 +41,7 @@ app.get("/", (req, res) => {
 app.use("/api/user", userRoutes);
 app.use("/api/admin/products", adminProductsRoutes);
 app.use("/api/user/products", userProductsRoutes);
+app.use("/api/user/cart", userCartRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on ${PORT}`);
