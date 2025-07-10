@@ -18,19 +18,23 @@ import {
 import { ArrowUpDown } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createSearchParams, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 
 const Listing = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const category = searchParams.get("category");
+
   const dispatch = useDispatch();
   const { productList, productDetails } = useSelector(
     (state) => state.userProducts
   );
+  const { cartItems } = useSelector((state) => state.userCart);
   const { user } = useSelector((state) => state.auth);
 
   const [filters, setFilters] = useState({});
   const [sort, setSort] = useState(null);
-  const [searchParams, setSearchParams] = useSearchParams();
+
   const [openproductDetailsDialog, setOpenProductDetailsDialog] =
     useState(false);
 
@@ -84,8 +88,24 @@ const Listing = () => {
     dispatch(fetchProductDetails(productId));
   };
 
-  const handleAddToCart = (productId) => {
-    console.log(productId);
+  const handleAddToCart = (productId, getTotalStock) => {
+    console.log("cartItems", cartItems);
+    let getCartItems = cartItems.items || [];
+
+    if (getCartItems.length) {
+      const indexOfCurrentItem = getCartItems.findIndex(
+        (item) => item.productId === productId
+      );
+
+      if (indexOfCurrentItem > -1) {
+        const getQuantity = getCartItems[indexOfCurrentItem].quantity;
+
+        if (getQuantity + 1 > getTotalStock) {
+          toast.error(`Only ${getQuantity} quantity canbe added for this item`);
+          return;
+        }
+      }
+    }
 
     dispatch(addToCart({ userId: user?._id, productId, quantity: 1 })).then(
       (data) => {
@@ -99,11 +119,6 @@ const Listing = () => {
       }
     );
   };
-
-  useEffect(() => {
-    setSort("price-lowtohigh");
-    setFilters(JSON.parse(localStorage.getItem("filters")) || {});
-  }, []);
 
   useEffect(() => {
     if (filters !== null && sort !== null)
@@ -124,6 +139,33 @@ const Listing = () => {
       setOpenProductDetailsDialog(true);
     }
   }, [productDetails]);
+
+  useEffect(() => {
+    const savedFilters = JSON.parse(localStorage.getItem("filters")) || {};
+
+    // ✅ If URL has category, parse it into array
+    if (category) {
+      const categoriesFromUrl = category.split(",");
+
+      if (category !== "products") {
+        savedFilters.category = categoriesFromUrl;
+      } else {
+        delete savedFilters.category;
+      }
+    }
+
+    // ✅ Normalize all filters to arrays (just in case)
+    for (const key in savedFilters) {
+      if (!Array.isArray(savedFilters[key])) {
+        savedFilters[key] = [savedFilters[key]];
+      }
+    }
+
+    setFilters(savedFilters);
+    setSort("price-lowtohigh");
+  }, [category]);
+
+  console.log("productList", productList);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6">

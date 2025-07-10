@@ -1,6 +1,6 @@
 import { LogOut, Menu, ShoppingCart, User } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Button } from "../ui/button";
 import { useDispatch, useSelector } from "react-redux";
@@ -27,14 +27,17 @@ const MenuItems = () => {
   const handleNavigate = (menuItem) => {
     localStorage.removeItem("filters");
     const currentFilter =
-      menuItem?.id !== "home"
+      menuItem.id !== "home" && menuItem.id !== "products"
         ? {
-            category: [menuItem?.id],
+            category: [menuItem.id],
           }
         : null;
 
-    localStorage.setItem("filters", JSON.stringify(currentFilter));
-    navigate(menuItem.path);
+    if (currentFilter) {
+      localStorage.setItem("filters", JSON.stringify(currentFilter));
+    }
+
+    navigate(`${menuItem.path}?category=${menuItem.id}`);
   };
   return (
     <div className="flex flex-col mb-3 lg:mb-0 lg: items-center gap-6 lg:flex-row">
@@ -65,17 +68,18 @@ const HeaderRightContent = () => {
 
   useEffect(() => {
     dispatch(fetchCartItems({ id: user?._id }));
-  }, [dispatch, user?._id]);
+  }, [dispatch]);
 
   return (
     <div className="flex lg:items-center sm:flex-row flex-col gap-4 p-4">
-      <Sheet open={openCart} onOpenChange={setOpenCart(false)}>
+      <Sheet open={openCart} onOpenChange={() => setOpenCart(false)}>
         <Button onClick={() => setOpenCart(true)} className="cursor-pointer">
           <ShoppingCart className="h-6 w-6" />
           <span className="sr-only ">User cart</span>
         </Button>
 
         <CartWrapper
+          setOpenCart={setOpenCart}
           cartItems={
             cartItems && cartItems.items && cartItems.items.length > 0
               ? cartItems.items
@@ -119,7 +123,7 @@ const Header = () => {
   return (
     <div className="sticky top-0 z-40 w-full border-b bg-background ">
       <div className="flex h-16 items-center justify-between px-4 md:px-6 ">
-        <Link to="/shop/home" className="flex items-center gap-2">
+        <Link to="/user/home" className="flex items-center gap-2">
           <span className="font-bold">Zepto</span>
         </Link>
         <Sheet>

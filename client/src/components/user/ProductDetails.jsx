@@ -9,13 +9,30 @@ import { useDispatch, useSelector } from "react-redux";
 import { addToCart, fetchCartItems } from "@/store/user/cartSlice";
 import { toast } from "sonner";
 import { setProductDetails } from "@/store/user/productSlice";
+import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
 
 const ProductDetails = ({ open, setOpen, productDetails }) => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
+  const { cartItems } = useSelector((state) => state.userCart);
 
-  const handleAddToCart = (productId) => {
-    console.log(productId);
+  const handleAddToCart = (productId, getTotalStock) => {
+    let getCartItems = cartItems.items || [];
+
+    if (getCartItems.length) {
+      const indexOfCurrentItem = getCartItems.findIndex(
+        (item) => item.productId === productId
+      );
+
+      if (indexOfCurrentItem > -1) {
+        const getQuantity = getCartItems[indexOfCurrentItem].quantity;
+
+        if (getQuantity + 1 > getTotalStock) {
+          toast.error(`Only ${getQuantity} quantity canbe added for this item`);
+          return;
+        }
+      }
+    }
 
     dispatch(addToCart({ userId: user?._id, productId, quantity: 1 })).then(
       (data) => {
@@ -50,10 +67,12 @@ const ProductDetails = ({ open, setOpen, productDetails }) => {
           </div>
           <div className="">
             <div>
-              <h1 className="text-3xl font-bold">{productDetails?.title}</h1>
-              <p className="text-muted-foreground text-lg mb-10">
+              <DialogTitle className="text-3xl font-bold">
+                {productDetails?.title}
+              </DialogTitle>
+              <DialogDescription className="text-muted-foreground text-lg mb-10">
                 {productDetails?.description}
-              </p>
+              </DialogDescription>
             </div>
             <div className="flex items-center justify-between">
               <p
@@ -80,12 +99,23 @@ const ProductDetails = ({ open, setOpen, productDetails }) => {
               <span className="text-muted-foreground">(4.5)</span>
             </div>
             <div>
-              <Button
-                className="w-full mt-10 mb-6"
-                onClick={() => handleAddToCart(productDetails?._id)}
-              >
-                Add to cart
-              </Button>
+              {productDetails?.totalStock === 0 ? (
+                <Button className="w-full mt-10 mb-6 opacity-60 cursor-not-allowed">
+                  Out Of Stock
+                </Button>
+              ) : (
+                <Button
+                  className="w-full mt-10 mb-6"
+                  onClick={() =>
+                    handleAddToCart(
+                      productDetails?._id,
+                      productDetails?.totalStock
+                    )
+                  }
+                >
+                  Add to cart
+                </Button>
+              )}
             </div>
             <Separator />
             <div className="max-h-[300px] overflow-auto">

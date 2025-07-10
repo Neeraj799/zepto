@@ -35,13 +35,25 @@ const brandsWithIcon = [
 
 import { Card, CardContent } from "@/components/ui/card";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllFilteredProducts } from "@/store/user/productSlice";
+import {
+  fetchAllFilteredProducts,
+  fetchProductDetails,
+} from "@/store/user/productSlice";
 import ListProduct from "@/components/user/ListProduct";
 import { useNavigate } from "react-router-dom";
+import { addToCart, fetchCartItems } from "@/store/user/cartSlice";
+import { toast } from "sonner";
+import ProductDetails from "@/components/user/ProductDetails";
 
 const Home = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const { productList } = useSelector((state) => state.userProducts);
+  const { user } = useSelector((state) => state.auth);
+  const { productList, productDetails } = useSelector(
+    (state) => state.userProducts
+  );
+  const [openproductDetailsDialog, setOpenProductDetailsDialog] =
+    useState(false);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -55,6 +67,27 @@ const Home = () => {
 
     localStorage.setItem("filters", JSON.stringify(currentFilter));
     navigate("/user/listing");
+  };
+
+  const handleProductDetails = (productId) => {
+    console.log(productId);
+    dispatch(fetchProductDetails(productId));
+  };
+
+  const handleAddToCart = (productId) => {
+    console.log(productId);
+
+    dispatch(addToCart({ userId: user?._id, productId, quantity: 1 })).then(
+      (data) => {
+        if (data?.payload.success) {
+          console.log("data", data);
+          console.log("user", user);
+
+          dispatch(fetchCartItems({ id: user?._id }));
+          toast.success("Product added to cart");
+        }
+      }
+    );
   };
 
   useEffect(() => {
@@ -74,7 +107,11 @@ const Home = () => {
     );
   }, [dispatch]);
 
-  console.log("productList", productList);
+  useEffect(() => {
+    if (productDetails !== null) {
+      setOpenProductDetailsDialog(true);
+    }
+  }, [productDetails]);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -163,7 +200,12 @@ const Home = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {productList && productList.length > 0 ? (
               productList.map((item) => (
-                <ListProduct key={item._id} product={item} />
+                <ListProduct
+                  key={item._id}
+                  product={item}
+                  productDetails={() => handleProductDetails(item._id)}
+                  handleAddToCart={handleAddToCart}
+                />
               ))
             ) : (
               <div></div>
@@ -171,6 +213,11 @@ const Home = () => {
           </div>
         </div>
       </section>
+      <ProductDetails
+        open={openproductDetailsDialog}
+        setOpen={setOpenProductDetailsDialog}
+        productDetails={productDetails}
+      />
     </div>
   );
 };

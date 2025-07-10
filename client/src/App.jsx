@@ -23,6 +23,8 @@ import Unauthorized from "./pages/Unauthorized";
 // Import your Redux action
 import { initializeAuth } from "./store/auth-slice";
 import { Skeleton } from "./components/ui/skeleton";
+import PaypalReturn from "./pages/user/paypalReturn";
+import PaymentSuccess from "./pages/user/PaymentSuccess";
 
 // Protected Route Component
 const ProtectedRoute = ({ children, requiredRole = null }) => {
@@ -119,6 +121,8 @@ function App() {
           <Route path="listing" element={<Listing />} />
           <Route path="checkout" element={<Checkout />} />
           <Route path="account" element={<Account />} />
+          <Route path="paypal-return" element={<PaypalReturn />} />
+          <Route path="payment-success" element={<PaymentSuccess />} />
         </Route>
 
         {/* Other Routes */}
