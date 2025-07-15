@@ -3,6 +3,18 @@ import Cart from "../../models/Cart.js";
 import Order from "../../models/Order.js";
 import Product from "../../models/product.js";
 
+const createPaypalPayment = (paymentData) => {
+  return new Promise((resolve, reject) => {
+    paypal.payment.create(paymentData, function (error, payment) {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(payment);
+      }
+    });
+  });
+};
+
 const createOrder = async (req, res) => {
   try {
     const {
@@ -20,6 +32,25 @@ const createOrder = async (req, res) => {
       payerId,
     } = req.body;
 
+    // ✅ Validate essential fields
+    if (
+      !userId ||
+      !cartId ||
+      !Array.isArray(cartItems) ||
+      cartItems.length === 0
+    ) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid order data" });
+    }
+
+    if (!totalAmount || isNaN(totalAmount)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid total amount" });
+    }
+
+    // ✅ Format PayPal payment data
     const create_payment_json = {
       intent: "sale",
       payer: {
@@ -29,7 +60,6 @@ const createOrder = async (req, res) => {
         return_url: "http://localhost:5173/user/paypal-return",
         cancel_url: "http://localhost:5173/user/paypal-cancel",
       },
-
       transactions: [
         {
           item_list: {
@@ -45,53 +75,56 @@ const createOrder = async (req, res) => {
             currency: "USD",
             total: totalAmount.toFixed(2),
           },
-          description: "description",
+          description: "Order placed from your app",
         },
       ],
     };
 
-    paypal.payment.create(create_payment_json, async (error, paymentInfo) => {
-      if (error) {
-        console.log(error);
+    // ✅ Create PayPal payment
+    const paymentInfo = await createPaypalPayment(create_payment_json);
 
-        return res.status(500).json({
-          success: false,
-          message: "Error while creating paypal payment",
-        });
-      } else {
-        const newlyCreatedOrder = new Order({
-          userId,
-          cartId,
-          cartItems,
-          addressInfo,
-          orderStatus,
-          paymentMethod,
-          paymentStatus,
-          totalAmount,
-          orderDate,
-          orderUpdateDate,
-          paymentId,
-          payerId,
-        });
+    // ✅ Save order to DB
+    const newlyCreatedOrder = new Order({
+      userId,
+      cartId,
+      cartItems,
+      addressInfo,
+      orderStatus,
+      paymentMethod,
+      paymentStatus,
+      totalAmount,
+      orderDate,
+      orderUpdateDate,
+      paymentId,
+      payerId,
+    });
 
-        await newlyCreatedOrder.save();
+    await newlyCreatedOrder.save();
 
-        const approvalURL = paymentInfo.links.find(
-          (link) => link.rel === "approval_url"
-        ).href;
+    // ✅ Get approval URL to send back to client
+    const approvalURL = paymentInfo.links.find(
+      (link) => link.rel === "approval_url"
+    )?.href;
 
-        return res.status(201).json({
-          success: true,
-          approvalURL,
-          orderId: newlyCreatedOrder._id,
-        });
-      }
+    if (!approvalURL) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to retrieve PayPal approval URL",
+      });
+    }
+
+    return res.status(201).json({
+      success: true,
+      approvalURL,
+      orderId: newlyCreatedOrder._id,
     });
   } catch (error) {
-    console.log(error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Internal Server Error" });
+    console.error("Create Order Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message || error,
+    });
   }
 };
 
