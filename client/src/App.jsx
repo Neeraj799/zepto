@@ -5,8 +5,8 @@ import { Toaster } from "@/components/ui/sonner";
 
 // Import your components
 import AuthLayout from "./components/auth/AuthLayout";
-import Login from "./pages/auth/login";
-import Signup from "./pages/auth/signup";
+import Login from "./pages/auth/Login";
+import Signup from "./pages/auth/Signup";
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
