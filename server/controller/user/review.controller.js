@@ -1,5 +1,5 @@
 import Order from "../../models/Order.js";
-import Product from "../../models/product.js";
+import Product from "../../models/Product.js";
 import Review from "../../models/Review.js";
 
 const addProductReview = async (req, res) => {
