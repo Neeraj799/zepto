@@ -10,7 +10,7 @@ export const addNewAddress = createAsyncThunk(
   "/address/addNewAddress",
   async (formData) => {
     const response = await axios.post(
-      "http://localhost:4800/api/user/address/add",
+      `${import.meta.env.VITE_BACKEND_URL}/api/user/address/add`,
       formData
     );
 
@@ -22,7 +22,7 @@ export const fetchAllAddress = createAsyncThunk(
   "/address/fetchAllAddress",
   async (userId) => {
     const response = await axios.get(
-      `http://localhost:4800/api/user/address/get/${userId}`
+      `${import.meta.env.VITE_BACKEND_URL}/api/user/address/get/${userId}`
     );
 
     return response.data;
@@ -33,7 +33,9 @@ export const updateAddress = createAsyncThunk(
   "/address/updateAddress",
   async ({ userId, addressId, formData }) => {
     const response = await axios.patch(
-      `http://localhost:4800/api/user/address/update/${userId}/${addressId}`,
+      `${
+        import.meta.env.VITE_BACKEND_URL
+      }/api/user/address/update/${userId}/${addressId}`,
 
       formData
     );
@@ -46,7 +48,9 @@ export const deleteAddress = createAsyncThunk(
   "/address/deleteAddress",
   async ({ userId, addressId }) => {
     const response = await axios.delete(
-      `http://localhost:4800/api/user/address/delete/${userId}/${addressId}`
+      `${
+        import.meta.env.VITE_BACKEND_URL
+      }/api/user/address/delete/${userId}/${addressId}`
     );
 
     return response.data;

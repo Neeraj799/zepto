@@ -11,7 +11,7 @@ export const addReview = createAsyncThunk(
   async (formData, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `http://localhost:4800/api/user/review/add`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/review/add`,
         formData
       );
 
@@ -28,7 +28,7 @@ export const getReviews = createAsyncThunk(
   "/review/getSearchResults",
   async (id) => {
     const response = await axios.get(
-      `http://localhost:4800/api/user/review/${id}`
+      `${import.meta.env.VITE_BACKEND_URL}/api/user/review/${id}`
     );
 
     return response.data;

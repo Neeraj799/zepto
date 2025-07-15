@@ -22,7 +22,7 @@ export const registerUser = createAsyncThunk(
   "/auth/signup",
   async (formData) => {
     const response = await axios.post(
-      "http://localhost:4800/api/user/signup",
+      `${import.meta.env.VITE_BACKEND_URL}/api/user/signup`,
       formData,
       {
         withCredentials: true,
@@ -38,7 +38,7 @@ export const loginUser = createAsyncThunk(
   async (formData, thunkAPI) => {
     try {
       const response = await axios.post(
-        "http://localhost:4800/api/user/login",
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/login`,
         formData,
         {
           withCredentials: true,

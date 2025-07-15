@@ -10,7 +10,7 @@ export const addToCart = createAsyncThunk(
   "/cart/addToCart",
   async ({ userId, productId, quantity }) => {
     const response = await axios.post(
-      "http://localhost:4800/api/user/cart/add",
+      `${import.meta.env.VITE_BACKEND_URL}/api/user/cart/add`,
       {
         userId,
         productId,
@@ -29,7 +29,7 @@ export const fetchCartItems = createAsyncThunk(
     console.log("userId", id);
 
     const response = await axios.get(
-      `http://localhost:4800/api/user/cart/get/${id}`
+      `${import.meta.env.VITE_BACKEND_URL}/api/user/cart/get/${id}`
     );
     return response.data;
   }
@@ -39,7 +39,7 @@ export const deleteCartItem = createAsyncThunk(
   "/cart/deleteCartItem",
   async ({ userId, productId }) => {
     const response = await axios.delete(
-      `http://localhost:4800/api/user/cart/${userId}/${productId}`
+      `${import.meta.env.VITE_BACKEND_URL}/api/user/cart/${userId}/${productId}`
     );
     return response.data;
   }
@@ -49,7 +49,7 @@ export const updateCartQuantity = createAsyncThunk(
   "/cart/updateCartQuantity",
   async ({ userId, productId, quantity }) => {
     const response = await axios.patch(
-      "http://localhost:4800/api/user/cart/update-cart",
+      `${import.meta.env.VITE_BACKEND_URL}/api/user/cart/update-cart`,
       {
         userId,
         productId,
