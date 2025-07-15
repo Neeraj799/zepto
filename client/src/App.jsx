@@ -23,7 +23,7 @@ import Unauthorized from "./pages/Unauthorized";
 // Import your Redux action
 import { initializeAuth } from "./store/auth-slice";
 import { Skeleton } from "./components/ui/skeleton";
-import PaypalReturn from "./pages/user/paypalReturn";
+import PaypalReturn from "./pages/user/PaypalReturn";
 import PaymentSuccess from "./pages/user/PaymentSuccess";
 import Search from "./pages/user/Search";
 
