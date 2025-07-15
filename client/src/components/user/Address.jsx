@@ -12,7 +12,7 @@ import {
 import AddressCard from "./AddressCard";
 import { toast } from "sonner";
 
-const Address = ({ setCurrentSelectedAddress }) => {
+const Address = ({ setCurrentSelectedAddress, selectedId }) => {
   const initialAddressFormData = {
     address: "",
     city: "",
@@ -114,6 +114,7 @@ const Address = ({ setCurrentSelectedAddress }) => {
           {addressList && addressList.length > 0 ? (
             addressList.map((item) => (
               <AddressCard
+                selectedId={selectedId}
                 key={item._id}
                 handleDeleteAddress={handleDeleteAddress}
                 handleEditAddress={handleEditAddress}

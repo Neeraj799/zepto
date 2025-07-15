@@ -1,7 +1,4 @@
 import React, { useEffect, useState } from "react";
-import bannerOne from "../../assets/banner-1.webp";
-import bannerTwo from "../../assets/banner-2.webp";
-import bannerThree from "../../assets/banner-3.webp";
 import { Button } from "@/components/ui/button";
 import {
   BabyIcon,
@@ -44,6 +41,7 @@ import { useNavigate } from "react-router-dom";
 import { addToCart, fetchCartItems } from "@/store/user/cartSlice";
 import { toast } from "sonner";
 import ProductDetails from "@/components/user/ProductDetails";
+import { getFeatureImages } from "@/store/common/commonSlice";
 
 const Home = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -53,11 +51,10 @@ const Home = () => {
   );
   const [openproductDetailsDialog, setOpenProductDetailsDialog] =
     useState(false);
+  const { featureImageList } = useSelector((state) => state.commonFeature);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  const slides = [bannerOne, bannerTwo, bannerThree];
 
   const handleNavigateToListingPage = (item, section) => {
     localStorage.removeItem("filters");
@@ -91,12 +88,18 @@ const Home = () => {
   };
 
   useEffect(() => {
+    dispatch(getFeatureImages());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (featureImageList.length === 0) return;
+
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
+      setCurrentSlide((prev) => (prev + 1) % featureImageList.length);
     }, 3000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [featureImageList]);
 
   useEffect(() => {
     dispatch(
@@ -116,22 +119,25 @@ const Home = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <div className="relative w-full h-[600px] overflow-hidden">
-        {slides.map((slide, index) => (
-          <img
-            src={slide}
-            alt={`Slide ${index + 1}`}
-            key={index}
-            className={`${
-              index === currentSlide ? "opacity-100" : "opacity-0"
-            } absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000`}
-          />
-        ))}
+        {featureImageList && featureImageList.length > 0
+          ? featureImageList.map((slide, index) => (
+              <img
+                src={slide?.image}
+                alt={`Slide ${index + 1}`}
+                key={index}
+                className={`${
+                  index === currentSlide ? "opacity-100" : "opacity-0"
+                } absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000`}
+              />
+            ))
+          : null}
         <Button
           variant="outline"
           size="icon"
           onClick={() =>
             setCurrentSlide(
-              (prev) => (prev - 1 + slides.length) % slides.length
+              (prev) =>
+                (prev - 1 + featureImageList.length) % featureImageList.length
             )
           }
           className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-white/80"
@@ -142,7 +148,9 @@ const Home = () => {
         <Button
           variant="outline"
           size="icon"
-          onClick={() => setCurrentSlide((prev) => (prev + 1) % slides.length)}
+          onClick={() =>
+            setCurrentSlide((prev) => (prev + 1) % featureImageList.length)
+          }
           className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-white/80"
         >
           <ChevronRightIcon className="w-4 h-4" />

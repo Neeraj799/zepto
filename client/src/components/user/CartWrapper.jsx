@@ -28,7 +28,7 @@ const CartWrapper = ({ cartItems, setOpenCart }) => {
         <div className="">
           {cartItems && cartItems.length > 0
             ? cartItems.map((item, index) => (
-                <CartContent key={index} cartItems={item} />
+                <CartContent key={index} cartItem={item} />
               ))
             : null}
         </div>

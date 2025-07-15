@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import img from "../../assets/account.jpg";
 import Address from "@/components/user/Address";
 import { useDispatch, useSelector } from "react-redux";
@@ -80,9 +80,13 @@ const Checkout = () => {
     });
   };
 
-  if (approvalURL) {
-    window.location.href = approvalURL;
-  }
+  useEffect(() => {
+    if (approvalURL) {
+      window.location.href = approvalURL;
+    }
+  }, [approvalURL]);
+
+  console.log("cartItems", cartItems);
 
   return (
     <div className="flex flex-col">
@@ -94,11 +98,14 @@ const Checkout = () => {
         />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-5 p-5">
-        <Address setCurrentSelectedAddress={setCurrentSelectedAddress} />
+        <Address
+          selectedId={currentSelectedAddress}
+          setCurrentSelectedAddress={setCurrentSelectedAddress}
+        />
         <div className="flex flex-col gap-4">
-          {cartItems && cartItems.items && cartItems.items.length > 0
+          {cartItems && cartItems?.items && cartItems?.items.length > 0
             ? cartItems.items.map((item) => (
-                <CartContent key={item.productId} cartItems={item} />
+                <CartContent key={item.productId} cartItem={item} />
               ))
             : null}
           <div className="p-4">
@@ -109,7 +116,9 @@ const Checkout = () => {
           </div>
           <div className="mt-4 w-full">
             <Button onClick={handleInitiatePaypalPayment} className="w-full">
-              Checkout with paypal
+              {isPaymentStart
+                ? "Processing Paypal Payment..."
+                : "Checkout with Paypal"}
             </Button>
           </div>
         </div>

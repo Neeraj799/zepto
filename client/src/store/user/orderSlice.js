@@ -16,6 +16,7 @@ export const createNewOrder = createAsyncThunk(
       "http://localhost:4800/api/user/order/create",
       orderData
     );
+    console.log("Order response:", response.data);
 
     return response.data;
   }

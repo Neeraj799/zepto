@@ -34,9 +34,7 @@ const AdminProducts = () => {
   const [openCreateProductDialog, setOpenCreateProductDialog] = useState(false);
 
   const [formData, setFormData] = useState(initialFormData);
-
   const [imageFile, setImageFile] = useState(null);
-
   const [uploadedImageUrl, setUploadedImageUrl] = useState("");
   const [imageLoading, setImageLoading] = useState(false);
   const [currentId, setCurrentId] = useState(null);

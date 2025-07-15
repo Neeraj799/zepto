@@ -25,6 +25,7 @@ import { initializeAuth } from "./store/auth-slice";
 import { Skeleton } from "./components/ui/skeleton";
 import PaypalReturn from "./pages/user/paypalReturn";
 import PaymentSuccess from "./pages/user/PaymentSuccess";
+import Search from "./pages/user/Search";
 
 // Protected Route Component
 const ProtectedRoute = ({ children, requiredRole = null }) => {
@@ -123,6 +124,7 @@ function App() {
           <Route path="account" element={<Account />} />
           <Route path="paypal-return" element={<PaypalReturn />} />
           <Route path="payment-success" element={<PaymentSuccess />} />
+          <Route path="search" element={<Search />} />
         </Route>
 
         {/* Other Routes */}

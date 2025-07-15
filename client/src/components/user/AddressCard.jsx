@@ -8,7 +8,10 @@ const AddressCard = ({
   handleDeleteAddress,
   handleEditAddress,
   setCurrentSelectedAddress,
+  selectedId,
 }) => {
+  console.log("selectedId", selectedId);
+
   return (
     <div>
       <Card
@@ -17,6 +20,11 @@ const AddressCard = ({
             ? setCurrentSelectedAddress(addressInfo)
             : null
         }
+        className={`cursor-pointer border-blue-600 ${
+          selectedId?._id === addressInfo?._id
+            ? "border-blue-900 border-[4px]"
+            : "border-black"
+        }`}
       >
         <CardContent className="grid gap-4">
           <Label>Address: {addressInfo?.address}</Label>
