@@ -29,7 +29,7 @@ const Login = () => {
 
   return (
     // 🟢 CHANGED: Wrapped everything in a flex container with min-h-screen to center vertically and horizontally
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 sm:px-6 lg:px-8">
+    <div className="flex w-full min-h-screen items-center justify-center bg-gray-50 px-4 sm:px-2 lg:px-8">
       {/* 🟢 CHANGED: Added responsive container styling */}
       <div className="w-full max-w-md space-y-6 bg-white p-8 rounded-2xl shadow-md">
         <div className="text-center">
